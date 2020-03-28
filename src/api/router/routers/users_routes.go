@@ -9,7 +9,7 @@ var usersRoutes = []Route{
 	Route{
 		Uri:     "/users",
 		Method:  http.MethodGet,
-		Handler: controllers.GetUser,
+		Handler: controllers.GetUsers,
 	},
 	Route{
 		Uri:     "/users",
@@ -27,7 +27,7 @@ var usersRoutes = []Route{
 		Handler: controllers.UpdateUser,
 	},
 	Route{
-		Uri:     "users/{id}",
+		Uri:     "/users/{id}",
 		Method:  http.MethodDelete,
 		Handler: controllers.DeleteUser,
 	},
