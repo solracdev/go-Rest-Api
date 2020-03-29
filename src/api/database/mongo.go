@@ -4,6 +4,7 @@ import (
 	"config"
 	"context"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,32 +18,37 @@ type MongoDatabase interface {
 
 // MongoClient struct
 type MongoClient struct {
-	Client   *mongo.Client
+	context  context.Context
+	client   *mongo.Client
 	Database *mongo.Database
 }
 
 // Connect to DB
 func (mc *MongoClient) Connect() error {
 
+	// Declare Context type object for managing multiple API requests
+	mc.context, _ = context.WithTimeout(context.Background(), 15*time.Second)
+
 	// Set client options
 	clientOptions := options.Client().ApplyURI(config.DBURL)
 
 	// Connect to MongoDB
 	var err error
-	mc.Client, err = mongo.Connect(context.TODO(), clientOptions)
+	mc.client, err = mongo.Connect(mc.context, clientOptions)
 
 	// Check the connection
-	err = mc.Client.Ping(context.TODO(), nil)
+	err = mc.client.Ping(mc.context, nil)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	mc.Database = mc.Client.Database(config.DBNAME)
+	mc.Database = mc.client.Database(config.DBNAME)
+
 	return nil
 }
 
 // Disconnect from DB
 func (mc *MongoClient) Disconnect() {
-	defer mc.Client.Disconnect(context.TODO())
+	mc.client.Disconnect(mc.context)
 }

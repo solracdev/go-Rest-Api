@@ -30,8 +30,5 @@ func Load() {
 	}
 
 	DBNAME = os.Getenv("DB_NAME")
-	DBURL = fmt.Sprintf("mongodb://%s:%s@%s:%d/%s",
-		os.Getenv("DB_USER"), os.Getenv("DB_PASS"),
-		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
-		os.Getenv("DB_AUTH"))
+	DBURL = fmt.Sprintf("%s://%s:%s", os.Getenv("DB_DRIVER"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"))
 }

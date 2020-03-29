@@ -2,6 +2,7 @@ package api
 
 import (
 	"api/router"
+	"auto"
 	"config"
 	"fmt"
 	"log"
@@ -10,6 +11,7 @@ import (
 
 func Run() {
 	config.Load()
+	auto.Load()
 	fmt.Printf("\n\t Listening [::]:%d \n", config.PORT)
 	listen(config.PORT)
 }
