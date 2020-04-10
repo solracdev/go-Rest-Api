@@ -1,8 +1,9 @@
 package models
 
 import (
-	"api/security"
 	"time"
+
+	"github.com/solrac87/rest/src/api/security"
 )
 
 // User struct

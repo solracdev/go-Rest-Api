@@ -1,8 +1,6 @@
 package repository
 
-import (
-	"api/models"
-)
+import "github.com/solrac87/rest/src/api/models"
 
 // UserRepositoryInterface definition
 type UserRepositoryInterface interface {

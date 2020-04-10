@@ -1,9 +1,8 @@
 package router
 
 import (
-	"api/router/routers"
-
 	"github.com/gorilla/mux"
+	"github.com/solrac87/rest/src/api/router/routers"
 )
 
 func New() *mux.Router {

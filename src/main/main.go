@@ -1,6 +1,8 @@
 package main
 
-import "api"
+import (
+	"github.com/solrac87/rest/src/api"
+)
 
 func main() {
 	api.Run()

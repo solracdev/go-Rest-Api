@@ -1,10 +1,9 @@
 package crud
 
 import (
-	"api/database"
-	"api/models"
-	"api/utils/channels"
-
+	"github.com/solrac87/rest/src/api/database"
+	"github.com/solrac87/rest/src/api/models"
+	"github.com/solrac87/rest/src/api/utils/channels"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"api/models"
-	"api/responses"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/solrac87/rest/src/api/models"
+	"github.com/solrac87/rest/src/api/responses"
 )
 
 type UserController struct {

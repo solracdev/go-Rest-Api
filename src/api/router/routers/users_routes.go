@@ -1,8 +1,9 @@
 package routers
 
 import (
-	"api/controllers"
 	"net/http"
+
+	"github.com/solrac87/rest/src/api/controllers"
 )
 
 var usersRoutes = []Route{

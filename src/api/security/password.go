@@ -1,8 +1,6 @@
 package security
 
-import (
-	"golang.org/x/crypto/bcrypt"
-)
+import "golang.org/x/crypto/bcrypt"
 
 // Hash funtion to encode password
 func Hash(password string) ([]byte, error) {

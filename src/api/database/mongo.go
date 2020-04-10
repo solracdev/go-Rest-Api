@@ -1,11 +1,11 @@
 package database
 
 import (
-	"config"
 	"context"
 	"log"
 	"time"
 
+	"github.com/solrac87/rest/src/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

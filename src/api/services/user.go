@@ -1,8 +1,8 @@
 package services
 
 import (
-	"api/models"
-	"api/repository/crud"
+	"github.com/solrac87/rest/src/api/models"
+	"github.com/solrac87/rest/src/api/repository/crud"
 )
 
 type UserService struct {

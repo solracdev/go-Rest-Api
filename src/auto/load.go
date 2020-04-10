@@ -1,11 +1,12 @@
 package auto
 
 import (
-	"api/database"
-	"api/utils/console"
 	"context"
 	"fmt"
 	"log"
+
+	"github.com/solrac87/rest/src/api/database"
+	"github.com/solrac87/rest/src/api/utils/console"
 )
 
 // Load Data into DB

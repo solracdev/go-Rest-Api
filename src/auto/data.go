@@ -1,8 +1,9 @@
 package auto
 
 import (
-	"api/models"
 	"time"
+
+	"github.com/solrac87/rest/src/api/models"
 )
 
 var users = []models.User{
