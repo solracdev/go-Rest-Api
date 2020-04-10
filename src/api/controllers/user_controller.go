@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/solrac87/rest/src/api/models"
 	"github.com/solrac87/rest/src/api/responses"
+	"github.com/solrac87/rest/src/api/services"
 )
 
 type UserController struct {
@@ -31,6 +33,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 	}
+
+	user, err = services.User.CreateUser(user)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	w.Header().Set("Location", fmt.Sprintf("%s%s/%d", r.Host, r.RequestURI, user.NickName))
+	responses.JSON(w, http.StatusCreated, user)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {

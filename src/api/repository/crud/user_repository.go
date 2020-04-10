@@ -1,6 +1,9 @@
 package crud
 
 import (
+	"context"
+	"log"
+
 	"github.com/solrac87/rest/src/api/database"
 	"github.com/solrac87/rest/src/api/models"
 	"github.com/solrac87/rest/src/api/utils/channels"
@@ -10,27 +13,31 @@ import (
 const collection string = "users"
 
 type UserRepository struct {
-	handle *mongo.Collection
+	collection *mongo.Collection
 }
 
-func (ur *UserRepository) NewUserRepository(mc *database.MongoClient) *UserRepository {
-	return &UserRepository{
-		handle: mc.Database.Collection(collection),
-	}
+var User UserRepository
+
+func (ur *UserRepository) Init(db *database.MongoDB) {
+	ur.collection = db.Database.Collection(collection)
 }
 
 func (ur *UserRepository) Create(user models.User) (models.User, error) {
 
-	var err error
 	done := make(chan bool)
+	errorCh := make(chan error)
 
 	go func(ch chan<- bool) {
 
+		insertResult, err := ur.collection.InsertOne(context.Background(), user)
+
 		if err != nil {
 			ch <- false
+			errorCh <- err
 			return
 		}
 
+		log.Println("Inserted count -> ", insertResult)
 		ch <- true
 	}(done)
 
@@ -38,5 +45,5 @@ func (ur *UserRepository) Create(user models.User) (models.User, error) {
 		return user, nil
 	}
 
-	return models.User{}, err
+	return models.User{}, <-errorCh
 }

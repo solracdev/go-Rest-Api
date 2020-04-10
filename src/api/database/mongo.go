@@ -8,47 +8,42 @@ import (
 	"github.com/solrac87/rest/src/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// MongoDatabase interface
-type MongoDatabase interface {
-	Connect
-	Disconnect
-}
-
-// MongoClient struct
-type MongoClient struct {
-	context  context.Context
+// MongoDB struct
+type MongoDB struct {
+	ctx      context.Context
 	client   *mongo.Client
 	Database *mongo.Database
 }
 
 // Connect to DB
-func (mc *MongoClient) Connect() error {
+func (db *MongoDB) Connect() error {
 
-	// Declare Context type object for managing multiple API requests
-	mc.context, _ = context.WithTimeout(context.Background(), 15*time.Second)
-
-	// Set client options
-	clientOptions := options.Client().ApplyURI(config.DBURL)
-
-	// Connect to MongoDB
 	var err error
-	mc.client, err = mongo.Connect(mc.context, clientOptions)
-
-	// Check the connection
-	err = mc.client.Ping(mc.context, nil)
+	db.client, err = mongo.NewClient(options.Client().ApplyURI(config.DBURL))
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	mc.Database = mc.client.Database(config.DBNAME)
+	db.ctx, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	err = db.client.Connect(db.ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	return nil
+	err = db.client.Ping(db.ctx, readpref.Primary())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db.Database = db.client.Database(config.DBNAME)
+	return err
 }
 
 // Disconnect from DB
-func (mc *MongoClient) Disconnect() {
-	mc.client.Disconnect(mc.context)
+func (db *MongoDB) Disconnect() {
+	db.client.Disconnect(db.ctx)
 }
