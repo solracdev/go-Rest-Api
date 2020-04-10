@@ -1,6 +1,15 @@
 package controllers
 
-import "net/http"
+import (
+	"api/models"
+	"api/responses"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+)
+
+type UserController struct {
+}
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 
@@ -8,7 +17,19 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Create User"))
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	user := models.User{}
+	err = json.Unmarshal(body, &user)
+
+	if err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+	}
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
