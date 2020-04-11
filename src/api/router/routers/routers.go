@@ -3,6 +3,8 @@ package routers
 import (
 	"net/http"
 
+	"github.com/solrac87/rest/src/api/middlewares"
+
 	"github.com/gorilla/mux"
 )
 
@@ -20,6 +22,17 @@ func Load() []Route {
 func SetupRoutes(r *mux.Router) *mux.Router {
 	for _, route := range Load() {
 		r.HandleFunc(route.Uri, route.Handler).Methods(route.Method)
+	}
+
+	return r
+}
+
+func SetupRoutesWithMiddlewares(r *mux.Router) *mux.Router {
+	for _, route := range Load() {
+		r.HandleFunc(route.Uri,
+			middlewares.SetMiddlewareLogger(
+				middlewares.SetMiddlewareJSON(route.Handler)),
+		).Methods(route.Method)
 	}
 
 	return r
