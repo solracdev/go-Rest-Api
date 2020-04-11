@@ -109,5 +109,6 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Entity", fmt.Sprintf("%s", n))
 	responses.JSON(w, http.StatusNoContent, deleteCount)
 }
