@@ -9,18 +9,22 @@ import (
 	"github.com/solrac87/rest/src/api/utils/channels"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const collection string = "users"
+const usersCollectionName string = "users"
+const counterCollectionName string = "counters"
 
 type UserRepository struct {
-	collection *mongo.Collection
+	usersCollection   *mongo.Collection
+	counterCollection *mongo.Collection
 }
 
 var User UserRepository
 
 func (ur *UserRepository) Init(db *database.MongoDB) {
-	ur.collection = db.Database.Collection(collection)
+	ur.usersCollection = db.Database.Collection(usersCollectionName)
+	ur.counterCollection = db.Database.Collection(counterCollectionName)
 }
 
 func (ur *UserRepository) Create(user models.User) (models.User, error) {
@@ -30,7 +34,15 @@ func (ur *UserRepository) Create(user models.User) (models.User, error) {
 
 	go func(ch chan<- bool) {
 
-		insertResult, err := ur.collection.InsertOne(context.Background(), user)
+		seq, err := ur.getNextSequence()
+		if err != nil {
+			ch <- false
+			errorCh <- err
+			return
+		}
+
+		user.ID = seq
+		insertResult, err := ur.usersCollection.InsertOne(context.Background(), user)
 
 		if err != nil {
 			ch <- false
@@ -58,7 +70,7 @@ func (ur *UserRepository) FindAll(filter interface{}) ([]models.User, error) {
 
 	go func(ch chan<- bool) {
 
-		cursor, err := ur.collection.Find(context.Background(), filter)
+		cursor, err := ur.usersCollection.Find(context.Background(), filter)
 
 		if err != nil {
 			ch <- false
@@ -106,7 +118,7 @@ func (ur *UserRepository) FindByNickname(n string) (models.User, error) {
 
 func (ur *UserRepository) Update(filter, update interface{}) (int64, error) {
 
-	updateResult, err := ur.collection.UpdateOne(context.Background(), filter, update)
+	updateResult, err := ur.usersCollection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return 0, err
 	}
@@ -116,11 +128,38 @@ func (ur *UserRepository) Update(filter, update interface{}) (int64, error) {
 
 func (ur *UserRepository) Delete(filter interface{}) (int64, error) {
 
-	results, err := ur.collection.DeleteOne(context.Background(), filter)
+	results, err := ur.usersCollection.DeleteOne(context.Background(), filter)
 
 	if err != nil {
 		return 0, err
 	}
 
 	return results.DeletedCount, nil
+}
+
+func (ur *UserRepository) getNextSequence() (int32, error) {
+
+	filter := bson.M{"_id": usersCollectionName}
+	update := bson.M{
+		"$inc": bson.M{"seq": 1},
+	}
+
+	upsert := true
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
+
+	result := ur.counterCollection.FindOneAndUpdate(context.Background(), filter, update, &opt)
+
+	if result.Err() != nil {
+		return 0, result.Err()
+	}
+
+	doc := bson.M{}
+	decodeErr := result.Decode(&doc)
+	seq := doc["seq"].(int32)
+
+	return seq, decodeErr
 }
