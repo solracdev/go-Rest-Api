@@ -100,9 +100,9 @@ func (ur *UserRepository) FindAll(filter interface{}) ([]models.User, error) {
 	return users, <-errorCh
 }
 
-func (ur *UserRepository) FindByNickname(n string) (models.User, error) {
+func (ur *UserRepository) FindById(id int64) (models.User, error) {
 
-	filter := bson.M{"nickname": n}
+	filter := bson.M{"id": id}
 	results, err := ur.FindAll(filter)
 
 	if err != nil {
@@ -126,8 +126,9 @@ func (ur *UserRepository) Update(filter, update interface{}) (int64, error) {
 	return updateResult.ModifiedCount, nil
 }
 
-func (ur *UserRepository) Delete(filter interface{}) (int64, error) {
+func (ur *UserRepository) Delete(id int) (int64, error) {
 
+	filter := bson.M{"id": id}
 	results, err := ur.usersCollection.DeleteOne(context.Background(), filter)
 
 	if err != nil {
@@ -137,7 +138,7 @@ func (ur *UserRepository) Delete(filter interface{}) (int64, error) {
 	return results.DeletedCount, nil
 }
 
-func (ur *UserRepository) getNextSequence() (int32, error) {
+func (ur *UserRepository) getNextSequence() (int64, error) {
 
 	filter := bson.M{"_id": usersCollectionName}
 	update := bson.M{
@@ -159,7 +160,7 @@ func (ur *UserRepository) getNextSequence() (int32, error) {
 
 	doc := bson.M{}
 	decodeErr := result.Decode(&doc)
-	seq := doc["seq"].(int32)
+	seq := doc["seq"].(int64)
 
 	return seq, decodeErr
 }

@@ -8,7 +8,7 @@ import (
 
 // User struct
 type User struct {
-	ID        int32     `bson:"id" json:"id"`
+	ID        int64     `bson:"id" json:"id"`
 	NickName  string    `bson:"nickname" json:"nickname"`
 	Email     string    `bson:"email" json:"email"`
 	Password  string    `bson:"password" json:"password"`

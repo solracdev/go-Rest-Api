@@ -1,7 +1,6 @@
 package services
 
 import (
-	"errors"
 	"time"
 
 	"github.com/solrac87/rest/src/api/models"
@@ -37,39 +36,21 @@ func (us *UserService) FindAll() ([]models.User, error) {
 	return us.repository.FindAll(bson.M{})
 }
 
-func (us *UserService) FindByNickname(n string) (models.User, error) {
+func (us *UserService) FindById(id int64) (models.User, error) {
 
-	user, err := us.repository.FindByNickname(n)
+	user, err := us.repository.FindById(id)
 
 	if err != nil {
 		return models.User{}, err
 	}
 
-	if user.NickName == "" {
-		return models.User{}, errors.New("User not found with nickname: " + n)
-	}
-
 	return user, err
 }
 
-func (us *UserService) Update(n string, user models.User) (int64, error) {
-
-	// find user by URL param nickname
-	_, err := us.FindByNickname(n)
-
-	if err != nil {
-		return 0, err
-	}
-
-	// find user by body post nickname
-	existUser, _ := us.FindByNickname(user.NickName)
-
-	if (existUser != models.User{}) {
-		return 0, errors.New("User already exist with nickname: " + n)
-	}
+func (us *UserService) Update(id int64, user models.User) (int64, error) {
 
 	user.HashPassword(user.Password)
-	filter := bson.M{"nickname": n}
+	filter := bson.M{"id": id}
 	update := bson.D{
 		{
 			"$set", bson.D{
@@ -84,7 +65,6 @@ func (us *UserService) Update(n string, user models.User) (int64, error) {
 	return us.repository.Update(filter, update)
 }
 
-func (us *UserService) Delete(n string) (int64, error) {
-	filter := bson.M{"nickname": n}
-	return us.repository.Delete(filter)
+func (us *UserService) Delete(id int64) (int64, error) {
+	return us.repository.Delete(id)
 }

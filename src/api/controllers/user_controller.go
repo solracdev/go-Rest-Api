@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/solrac87/rest/src/api/models"
@@ -55,12 +55,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
-	nickname := params["nick"]
-	if nickname == "" {
-		responses.ERROR(w, http.StatusBadRequest, errors.New("Nickname is required"))
+	uid, err := strconv.ParseInt(params["id"], 10, 32)
+
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
 	}
 
-	user, err := services.User.FindByNickname(nickname)
+	user, err := services.User.FindById(uid)
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
@@ -85,9 +87,14 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := mux.Vars(r)
-	n := params["nick"]
+	uid, err := strconv.ParseInt(params["id"], 10, 32)
 
-	updatedCount, err := services.User.Update(n, user)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	updatedCount, err := services.User.Update(uid, user)
 
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
@@ -100,9 +107,14 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
-	n := params["nick"]
+	uid, err := strconv.ParseInt(params["id"], 10, 32)
 
-	deleteCount, err := services.User.Delete(n)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	deleteCount, err := services.User.Delete(uid)
 
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
