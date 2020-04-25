@@ -20,13 +20,17 @@ func (us *UserService) Init(r repository.UserRepositoryInterface) {
 
 func (us *UserService) CreateUser(u models.User) (models.User, error) {
 
-	u.HashPassword(u.Password)
-	u.CreatedAt = time.Now()
-	u.UpdatedAt = time.Now()
+	u.Prepare()
+	err := u.Validate("create")
+
+	if err != nil {
+		return models.User{}, err
+	}
+
 	user, err := us.repository.Create(u)
 
 	if err != nil {
-		return user, err
+		return models.User{}, err
 	}
 
 	return user, nil
@@ -48,6 +52,11 @@ func (us *UserService) FindById(id int64) (models.User, error) {
 }
 
 func (us *UserService) Update(id int64, user models.User) (int64, error) {
+
+	err := user.Validate("update")
+	if err != nil {
+		return 0, err
+	}
 
 	user.HashPassword(user.Password)
 	filter := bson.M{"id": id}

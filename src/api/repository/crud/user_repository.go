@@ -12,8 +12,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const usersCollectionName string = "users"
-const counterCollectionName string = "counters"
+const (
+	usersCollectionName   string = "users"
+	counterCollectionName string = "counters"
+)
 
 type UserRepository struct {
 	usersCollection   *mongo.Collection
@@ -126,7 +128,7 @@ func (ur *UserRepository) Update(filter, update interface{}) (int64, error) {
 	return updateResult.ModifiedCount, nil
 }
 
-func (ur *UserRepository) Delete(id int) (int64, error) {
+func (ur *UserRepository) Delete(id int64) (int64, error) {
 
 	filter := bson.M{"id": id}
 	results, err := ur.usersCollection.DeleteOne(context.Background(), filter)
@@ -160,7 +162,7 @@ func (ur *UserRepository) getNextSequence() (int64, error) {
 
 	doc := bson.M{}
 	decodeErr := result.Decode(&doc)
-	seq := doc["seq"].(int64)
+	seq := int64(doc["seq"].(int32))
 
 	return seq, decodeErr
 }

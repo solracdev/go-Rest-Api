@@ -20,4 +20,5 @@ func Load() {
 
 	// Initialize Uer Repo with data base connection
 	crud.User.Init(&mongoDB)
+	crud.Post.Init(&mongoDB)
 }

@@ -13,9 +13,6 @@ import (
 	"github.com/solrac87/rest/src/api/services"
 )
 
-type UserController struct {
-}
-
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	users, err := services.User.FindAll()
@@ -44,7 +41,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err = services.User.CreateUser(user)
 	if err != nil {
-		responses.ERROR(w, http.StatusInternalServerError, err)
+		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -121,6 +118,6 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Entity", fmt.Sprintf("%s", n))
+	w.Header().Set("Entity", fmt.Sprintf("%s", uid))
 	responses.JSON(w, http.StatusNoContent, deleteCount)
 }

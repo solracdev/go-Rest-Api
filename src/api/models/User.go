@@ -1,6 +1,9 @@
 package models
 
 import (
+	"errors"
+	"html"
+	"strings"
 	"time"
 
 	"github.com/solrac87/rest/src/api/security"
@@ -24,5 +27,35 @@ func (u *User) HashPassword(p string) error {
 	}
 
 	u.Password = string(hashedPassword)
+	return nil
+}
+
+func (u *User) Prepare() {
+	u.ID = 0
+	u.NickName = html.EscapeString(strings.TrimSpace(u.NickName))
+	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
+	u.HashPassword(u.Password)
+	u.CreatedAt = time.Now()
+	u.UpdatedAt = time.Now()
+}
+
+func (u *User) Validate(action string) error {
+
+	if u.NickName == "" {
+		return errors.New("Required Nickaname")
+	}
+
+	if u.Password == "" && action == "create" {
+		return errors.New("Required Password")
+	}
+
+	if u.Email == "" {
+		return errors.New("Required Email")
+	}
+
+	if strings.Contains(u.Email, "@") == false {
+		return errors.New("Invalid Email")
+	}
+
 	return nil
 }

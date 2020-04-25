@@ -7,4 +7,5 @@ func Load() {
 
 	// Initialize Services
 	User.Init(&crud.User)
+	Post.Init(&crud.Post)
 }

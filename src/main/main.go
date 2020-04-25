@@ -5,5 +5,7 @@ import (
 )
 
 func main() {
+
+	// video tutorial time -> 2h 1m
 	api.Run()
 }

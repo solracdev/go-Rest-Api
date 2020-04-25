@@ -6,7 +6,7 @@ import (
 	"github.com/solrac87/rest/src/api/controllers"
 )
 
-var usersRoutes = []Route{
+var userRoutes = []Route{
 	Route{
 		Uri:     "/users",
 		Method:  http.MethodGet,
